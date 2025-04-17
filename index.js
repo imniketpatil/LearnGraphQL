@@ -1,4 +1,3 @@
-import bodyParser from "body-parser";
 import express from "express";
 import cors from "cors";
 import { ApolloServer } from "@apollo/server";
@@ -9,6 +8,15 @@ async function startServer() {
   const app = express();
 
   const typeDefs = `
+    type User {
+        id: ID!
+        name: String!
+        username: String!
+        email: String!
+        phone: String!
+        website: String!
+    }
+
     type Todo {
       id: ID!
       title: String!
@@ -17,6 +25,8 @@ async function startServer() {
 
     type Query {
       getTodos: [Todo]
+      getUsers : [User]
+      getUser(id: ID!): User
     }
   `;
 
@@ -24,6 +34,13 @@ async function startServer() {
     Query: {
       getTodos: async () =>
         (await axios.get("https://jsonplaceholder.typicode.com/todos")).data,
+
+      getUsers: async () =>
+        (await axios.get("https://jsonplaceholder.typicode.com/users")).data,
+
+      getUser: async (parent, { id }) =>
+        (await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`))
+          .data,
     },
   };
 
